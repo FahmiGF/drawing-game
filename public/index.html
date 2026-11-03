@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tebak Gambar — multiplayer online</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span>✏️</span> Tebak Gambar</div>
+    <div class="topbar-right">
+      <span id="connStatus" class="status hidden">Menyambung…</span>
+      <span class="round-chip" id="roomChip"></span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ---------------------------------------------------------- join -->
+    <section id="screen-join" class="screen">
+      <div class="join-wrap">
+        <div class="card join-card">
+          <h1>Gambar. Tebak. Menang.</h1>
+          <p class="muted">3 ronde • 2–10 pemain • realtime online</p>
+
+          <label class="field">
+            <span>Nama kamu</span>
+            <input id="nameInput" maxlength="16" placeholder="mis. Fahmi" autocomplete="nickname" />
+          </label>
+
+          <button id="createBtn" class="btn primary block">Buat room baru</button>
+
+          <div class="divider"><span>atau gabung room</span></div>
+
+          <div class="join-row">
+            <input id="codeInput" class="code" maxlength="4" placeholder="KODE" autocapitalize="characters" autocomplete="off" />
+            <button id="joinBtn" class="btn">Gabung</button>
+          </div>
+
+          <p id="joinError" class="error"></p>
+        </div>
+        <ul class="rules card">
+          <li><b>Satu pemain menggambar</b>, yang lain menebak lewat chat.</li>
+          <li>Jawaban benar makin cepat = makin banyak poin.</li>
+          <li>Penggambar dapat poin tiap ada yang menebak benar.</li>
+          <li>Total <b>3 ronde</b>; tiap ronde semua pemain kebagian giliran.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------- lobby -->
+    <section id="screen-lobby" class="screen hidden">
+      <div class="lobby-layout">
+        <div class="card">
+          <div class="room-head">
+            <div>
+              <div class="label">Kode room</div>
+              <strong id="roomCode" class="room-code">----</strong>
+            </div>
+            <button id="copyBtn" class="btn small">Salin kode</button>
+          </div>
+          <p class="muted small">Bagikan kode ini — temanmu tinggal memasukkannya di halaman awal.</p>
+
+          <h2>Pemain <span id="playerCount" class="pill">0</span></h2>
+          <ul id="lobbyPlayers" class="player-list"></ul>
+
+          <div class="lobby-actions">
+            <label class="field grow">
+              <span>Tema kata</span>
+              <select id="themeSelect"></select>
+            </label>
+            <button id="readyBtn" class="btn">Siap</button>
+            <button id="startBtn" class="btn primary">Mulai game</button>
+          </div>
+          <p id="lobbyHint" class="muted small"></p>
+          <button id="leaveLobby" class="btn ghost small">Keluar room</button>
+        </div>
+
+        <aside class="card chat-card">
+          <h2>Obrolan</h2>
+          <div id="lobbyChat" class="chat-list"></div>
+          <form id="lobbyChatForm" class="chat-form">
+            <input id="lobbyChatInput" maxlength="80" placeholder="Tulis pesan…" autocomplete="off" />
+            <button class="btn small">Kirim</button>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------------------------- game -->
+    <section id="screen-game" class="screen hidden">
+      <div class="game-layout">
+        <div class="card board">
+          <div class="board-head">
+            <div class="round-info">
+              <span class="badge-round">Ronde <b id="roundNum">1</b>/<span id="roundTotal">3</span></span>
+              <span class="muted" id="themeLabel"></span>
+            </div>
+            <div class="timer">
+              <div class="bar"><i id="timerBar"></i></div>
+              <span id="timerText">0s</span>
+            </div>
+          </div>
+
+          <div class="word-row">
+            <div id="wordDisplay" class="word">&nbsp;</div>
+            <div id="drawerBadge" class="drawer-badge hidden">Kamu yang menggambar</div>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="board" width="960" height="600"></canvas>
+            <div id="overlay" class="overlay hidden"></div>
+          </div>
+
+          <div id="toolbar" class="toolbar hidden">
+            <div class="swatches">
+              <button class="swatch active" data-color="#111827" style="--c:#111827"></button>
+              <button class="swatch" data-color="#ef4444" style="--c:#ef4444"></button>
+              <button class="swatch" data-color="#f97316" style="--c:#f97316"></button>
+              <button class="swatch" data-color="#eab308" style="--c:#eab308"></button>
+              <button class="swatch" data-color="#22c55e" style="--c:#22c55e"></button>
+              <button class="swatch" data-color="#3b82f6" style="--c:#3b82f6"></button>
+              <button class="swatch" data-color="#a855f7" style="--c:#a855f7"></button>
+              <button class="swatch" data-color="#78350f" style="--c:#78350f"></button>
+            </div>
+            <div class="sizes">
+              <button class="size" data-size="4">S</button>
+              <button class="size active" data-size="8">M</button>
+              <button class="size" data-size="18">L</button>
+            </div>
+            <button id="eraserBtn" class="btn small ghost">Penghapus</button>
+            <button id="clearBtn" class="btn small ghost">Hapus semua</button>
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="card players-card">
+            <h2>Pemain</h2>
+            <ul id="gamePlayers" class="player-list compact"></ul>
+          </div>
+          <div class="card chat-card grow">
+            <h2>Chat &amp; tebakan</h2>
+            <div id="chatList" class="chat-list"></div>
+            <form id="chatForm" class="chat-form">
+              <input id="chatInput" maxlength="80" placeholder="Tebak kata di sini…" autocomplete="off" />
+              <button class="btn small primary">Kirim</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

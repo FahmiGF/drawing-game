@@ -1,0 +1,24 @@
+{
+  "name": "drawing-game",
+  "version": "1.0.0",
+  "description": "Game tebak gambar multiplayer online (3 ronde)",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node test/simulate.js && node test/e2e.js",
+    "test:e2e": "node test/e2e.js",
+    "test:ui": "node test/ui.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.3.0",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.11.1",
+    "socket.io-client": "^4.8.4"
+  }
+}
